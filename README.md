@@ -16,6 +16,9 @@ Initial project setup.
 
 The production deployment target is Azure App Service.
 
+The current staging deployment is available at https://manlearning-woojin-krc.azurewebsites.net.
+It runs in the `rg-manlearning-krc` resource group on the `asp-manlearning-krc` Linux B1 App Service Plan in Korea Central.
+
 ## External APIs
 
 External APIs will be determined through future technical spikes.
