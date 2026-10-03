@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using ManLearning.Application.Abstractions;
+using ManLearning.Domain.Learners;
 using ManLearning.Domain.Xp;
 
 namespace ManLearning.Infrastructure.Persistence;
@@ -16,5 +17,12 @@ public sealed class InMemoryXpAwardRepository : IXpAwardRepository
     {
         _awards.Add(award);
         return Task.CompletedTask;
+    }
+
+    public Task<IReadOnlyList<XpAward>> GetByLearnerAsync(
+        LearnerId learnerId, CancellationToken cancellationToken = default)
+    {
+        IReadOnlyList<XpAward> result = [.. _awards.Where(award => award.LearnerId == learnerId)];
+        return Task.FromResult(result);
     }
 }

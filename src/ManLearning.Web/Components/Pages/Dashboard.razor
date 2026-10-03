@@ -1,0 +1,93 @@
+@page "/me"
+@rendermode InteractiveServer
+@using ManLearning.Application.Learning
+@using ManLearning.Application.Learning.Dtos
+@inject LearnerDashboardService LearnerDashboardService
+@inject Web.Learners.CurrentLearnerContext CurrentLearner
+
+<PageTitle>내 학습 현황 - Man Learning</PageTitle>
+
+<h1 class="page-title">내 학습 현황</h1>
+
+@if (_loadError)
+{
+    <div class="state-card state-error" role="alert">
+        <p class="state-title">학습 현황을 불러오지 못했습니다</p>
+        <p class="state-body">잠시 후 다시 시도해 주세요.</p>
+        <button type="button" class="btn-secondary" @onclick="LoadAsync">다시 시도</button>
+    </div>
+}
+else if (_dashboard is null)
+{
+    <div class="dashboard-summary" aria-hidden="true">
+        <div class="summary-card skeleton"></div>
+        <div class="summary-card skeleton"></div>
+    </div>
+}
+else
+{
+    <div class="dashboard-summary">
+        <div class="summary-card">
+            <p class="summary-value">@_dashboard.TotalXp<span class="summary-unit">XP</span></p>
+            <p class="summary-label">누적 경험치</p>
+        </div>
+        <div class="summary-card">
+            <p class="summary-value">@_dashboard.CompletedLessonCount<span class="summary-unit">/ @_dashboard.TotalLessonCount</span></p>
+            <p class="summary-label">완료한 레슨</p>
+        </div>
+    </div>
+
+    <h2 class="section-title">코스별 진행률</h2>
+
+    @if (_dashboard.CourseProgress.Count == 0)
+    {
+        <div class="state-card">
+            <p class="state-title">아직 등록된 코스가 없습니다</p>
+            <p class="state-body">새 코스가 열리면 이곳에 진행률이 표시됩니다.</p>
+        </div>
+    }
+    else
+    {
+        <ul class="progress-list">
+            @foreach (var course in _dashboard.CourseProgress)
+            {
+                var percent = course.TotalLessonCount == 0
+                    ? 0
+                    : (int)Math.Round(100.0 * course.CompletedLessonCount / course.TotalLessonCount);
+
+                <li class="progress-row">
+                    <a class="progress-row-link" href="@($"/courses/{course.CourseId.Value}")">
+                        <span class="progress-row-title">@course.CourseTitle</span>
+                        <span class="progress-row-meta">@course.CompletedLessonCount / @course.TotalLessonCount 레슨 완료</span>
+                        <span class="progress-bar" role="progressbar" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100" aria-valuetext="@($"{percent}% 완료")">
+                            <span class="progress-bar-fill" style="width: @(percent)%;"></span>
+                        </span>
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+}
+
+@code {
+    private LearnerDashboardDto? _dashboard;
+    private bool _loadError;
+
+    protected override Task OnInitializedAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        _loadError = false;
+        _dashboard = null;
+        StateHasChanged();
+
+        try
+        {
+            _dashboard = await LearnerDashboardService.GetDashboardAsync(CurrentLearner.LearnerId);
+        }
+        catch (Exception)
+        {
+            _loadError = true;
+        }
+    }
+}

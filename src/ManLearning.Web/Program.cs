@@ -13,6 +13,7 @@ builder.Services.AddManLearningInfrastructure();
 builder.Services.AddScoped<CourseCatalogService>();
 builder.Services.AddScoped<LessonProgressService>();
 builder.Services.AddScoped<QuizAttemptService>();
+builder.Services.AddScoped<LearnerDashboardService>();
 builder.Services.AddScoped<CurrentLearnerContext>();
 
 var app = builder.Build();

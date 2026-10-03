@@ -28,3 +28,22 @@
     margin: 0 0 var(--space-8);
 }
 
+.hero-secondary-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: var(--space-2) var(--space-4);
+    margin-left: var(--space-3);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--text-muted);
+    text-decoration: underline;
+}
+
+@media (hover: hover) {
+    .hero-secondary-link:hover {
+        color: var(--text);
+    }
+}
+
