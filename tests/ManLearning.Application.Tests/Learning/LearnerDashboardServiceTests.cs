@@ -23,6 +23,9 @@ public class LearnerDashboardServiceTests
         var dashboard = await service.GetDashboardAsync(LearnerId.New());
 
         Assert.Equal(0, dashboard.TotalXp);
+        Assert.Equal(1, dashboard.LevelProgress.Level);
+        Assert.Equal(0, dashboard.LevelProgress.CurrentLevelXp);
+        Assert.Equal(100, dashboard.LevelProgress.NextLevelXp);
         Assert.Equal(0, dashboard.CompletedLessonCount);
         Assert.Equal(1, dashboard.TotalLessonCount);
         Assert.Equal(0, dashboard.CourseProgress.Single().CompletedLessonCount);
@@ -59,9 +62,9 @@ public class LearnerDashboardServiceTests
 
         var xpAwardRepository = new InMemoryXpAwardRepository();
         await xpAwardRepository.AddAsync(
-            new XpAward(learnerId, 10, "Completed lesson", DateTimeOffset.UtcNow));
+            new XpAward(learnerId, 60, "Completed lesson", DateTimeOffset.UtcNow));
         await xpAwardRepository.AddAsync(
-            new XpAward(learnerId, 10, "Completed another lesson", DateTimeOffset.UtcNow));
+            new XpAward(learnerId, 60, "Completed another lesson", DateTimeOffset.UtcNow));
 
         // XP and progress from a different learner must not leak into this learner's dashboard.
         var otherLearnerId = LearnerId.New();
@@ -72,7 +75,10 @@ public class LearnerDashboardServiceTests
 
         var dashboard = await service.GetDashboardAsync(learnerId);
 
-        Assert.Equal(20, dashboard.TotalXp);
+        Assert.Equal(120, dashboard.TotalXp);
+        Assert.Equal(2, dashboard.LevelProgress.Level);
+        Assert.Equal(100, dashboard.LevelProgress.CurrentLevelXp);
+        Assert.Equal(200, dashboard.LevelProgress.NextLevelXp);
         Assert.Equal(1, dashboard.CompletedLessonCount);
         Assert.Equal(3, dashboard.TotalLessonCount);
         Assert.Equal(2, dashboard.CourseProgress.Count);

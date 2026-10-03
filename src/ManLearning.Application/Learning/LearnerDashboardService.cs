@@ -2,13 +2,14 @@ using ManLearning.Application.Abstractions;
 using ManLearning.Application.Learning.Dtos;
 using ManLearning.Domain.Learners;
 using ManLearning.Domain.Progress;
+using ManLearning.Domain.Xp;
 
 namespace ManLearning.Application.Learning;
 
 /// <summary>
-/// Read-only use case that aggregates a learner's XP and lesson completion into a dashboard
-/// snapshot. Deliberately excludes level, streak, and achievement data; those rules are deferred
-/// open decisions (see docs/architecture/domain-model.md) and must not be invented here.
+/// Read-only use case that aggregates a learner's XP, level, and lesson completion into a
+/// dashboard snapshot. Deliberately excludes streak and achievement data; those rules remain
+/// deferred open decisions (see docs/architecture/domain-model.md) and must not be invented here.
 /// </summary>
 public sealed class LearnerDashboardService(
     ICourseRepository courseRepository,
@@ -36,8 +37,16 @@ public sealed class LearnerDashboardService(
                 course.Lessons.Count))
             .ToList();
 
+        var totalXp = awards.Sum(award => award.Amount);
+        var levelProgress = LevelCurve.GetLevelProgress(totalXp);
+
         return new LearnerDashboardDto(
-            awards.Sum(award => award.Amount),
+            totalXp,
+            new LevelProgressDto(
+                levelProgress.Level,
+                levelProgress.CurrentLevelXp,
+                levelProgress.NextLevelXp,
+                levelProgress.ProgressToNextLevel),
             courseProgress.Sum(course => course.CompletedLessonCount),
             courseProgress.Sum(course => course.TotalLessonCount),
             courseProgress);

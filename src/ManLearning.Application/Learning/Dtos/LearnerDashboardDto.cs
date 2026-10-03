@@ -7,6 +7,7 @@ namespace ManLearning.Application.Learning.Dtos;
 /// </summary>
 public sealed record LearnerDashboardDto(
     int TotalXp,
+    LevelProgressDto LevelProgress,
     int CompletedLessonCount,
     int TotalLessonCount,
     IReadOnlyList<CourseProgressDto> CourseProgress);

@@ -22,11 +22,22 @@ else if (_dashboard is null)
     <div class="dashboard-summary" aria-hidden="true">
         <div class="summary-card skeleton"></div>
         <div class="summary-card skeleton"></div>
+        <div class="summary-card skeleton"></div>
     </div>
 }
 else
 {
+    var levelPercent = (int)Math.Round(_dashboard.LevelProgress.ProgressToNextLevel * 100);
+
     <div class="dashboard-summary">
+        <div class="summary-card summary-card-level">
+            <p class="summary-value">Lv.@_dashboard.LevelProgress.Level</p>
+            <p class="summary-label">현재 레벨</p>
+            <span class="progress-bar" role="progressbar" aria-valuenow="@levelPercent" aria-valuemin="0" aria-valuemax="100" aria-valuetext="@($"다음 레벨까지 {levelPercent}%")">
+                <span class="progress-bar-fill" style="width: @(levelPercent)%;"></span>
+            </span>
+            <p class="summary-sublabel">@_dashboard.TotalXp / @_dashboard.LevelProgress.NextLevelXp XP</p>
+        </div>
         <div class="summary-card">
             <p class="summary-value">@_dashboard.TotalXp<span class="summary-unit">XP</span></p>
             <p class="summary-label">누적 경험치</p>
