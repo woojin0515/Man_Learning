@@ -21,6 +21,16 @@ public sealed class InMemoryLessonProgressRepository : ILessonProgressRepository
         return Task.FromResult(progress);
     }
 
+    public Task<IReadOnlyList<LessonProgress>> GetAllForLearnerAsync(
+        LearnerId learnerId, CancellationToken cancellationToken = default)
+    {
+        IReadOnlyList<LessonProgress> result = [.. _progressByKey
+            .Where(pair => pair.Key.LearnerId == learnerId)
+            .Select(pair => pair.Value)];
+
+        return Task.FromResult(result);
+    }
+
     public Task SaveAsync(LessonProgress progress, CancellationToken cancellationToken = default)
     {
         _progressByKey[(progress.LearnerId, progress.LessonId)] = progress;
