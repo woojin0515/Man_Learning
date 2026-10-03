@@ -3,6 +3,7 @@ using System;
 using ManLearning.Infrastructure.Persistence.EfCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -15,17 +16,21 @@ namespace ManLearning.Infrastructure.Persistence.EfCore.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.12");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "10.0.12")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("ManLearning.Domain.Courses.Course", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
@@ -35,18 +40,18 @@ namespace ManLearning.Infrastructure.Persistence.EfCore.Migrations
             modelBuilder.Entity("ManLearning.Domain.Courses.Lesson", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("CourseId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Position")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
@@ -59,16 +64,16 @@ namespace ManLearning.Infrastructure.Persistence.EfCore.Migrations
             modelBuilder.Entity("ManLearning.Domain.Learners.Streak", b =>
                 {
                     b.Property<Guid>("LearnerId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("CurrentLength")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<DateOnly?>("LastActiveDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("date");
 
                     b.Property<int>("LongestLength")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.HasKey("LearnerId");
 
@@ -78,15 +83,15 @@ namespace ManLearning.Infrastructure.Persistence.EfCore.Migrations
             modelBuilder.Entity("ManLearning.Domain.Progress.LessonProgress", b =>
                 {
                     b.Property<Guid>("LearnerId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("LessonId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("State")
                         .IsRequired()
                         .HasMaxLength(20)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("LearnerId", "LessonId");
 
@@ -97,21 +102,21 @@ namespace ManLearning.Infrastructure.Persistence.EfCore.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Amount")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<DateTimeOffset>("AwardedAtUtc")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("LearnerId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Reason")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(500)");
 
                     b.HasKey("Id");
 
@@ -131,10 +136,10 @@ namespace ManLearning.Infrastructure.Persistence.EfCore.Migrations
                     b.OwnsOne("ManLearning.Domain.Quizzes.Quiz", "Quiz", b1 =>
                         {
                             b1.Property<Guid>("LessonId")
-                                .HasColumnType("TEXT");
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<Guid>("Id")
-                                .HasColumnType("TEXT");
+                                .HasColumnType("uniqueidentifier");
 
                             b1.HasKey("LessonId");
 
@@ -146,15 +151,15 @@ namespace ManLearning.Infrastructure.Persistence.EfCore.Migrations
                             b1.OwnsMany("ManLearning.Domain.Quizzes.Question", "Questions", b2 =>
                                 {
                                     b2.Property<Guid>("LessonId")
-                                        .HasColumnType("TEXT");
+                                        .HasColumnType("uniqueidentifier");
 
                                     b2.Property<Guid>("Id")
-                                        .HasColumnType("TEXT");
+                                        .HasColumnType("uniqueidentifier");
 
                                     b2.Property<string>("Text")
                                         .IsRequired()
                                         .HasMaxLength(1000)
-                                        .HasColumnType("TEXT");
+                                        .HasColumnType("nvarchar(1000)");
 
                                     b2.HasKey("LessonId", "Id");
 
@@ -166,21 +171,21 @@ namespace ManLearning.Infrastructure.Persistence.EfCore.Migrations
                                     b2.OwnsMany("ManLearning.Domain.Quizzes.AnswerChoice", "AnswerChoices", b3 =>
                                         {
                                             b3.Property<Guid>("LessonId")
-                                                .HasColumnType("TEXT");
+                                                .HasColumnType("uniqueidentifier");
 
                                             b3.Property<Guid>("QuestionId")
-                                                .HasColumnType("TEXT");
+                                                .HasColumnType("uniqueidentifier");
 
                                             b3.Property<Guid>("Id")
-                                                .HasColumnType("TEXT");
+                                                .HasColumnType("uniqueidentifier");
 
                                             b3.Property<bool>("IsCorrect")
-                                                .HasColumnType("INTEGER");
+                                                .HasColumnType("bit");
 
                                             b3.Property<string>("Text")
                                                 .IsRequired()
                                                 .HasMaxLength(500)
-                                                .HasColumnType("TEXT");
+                                                .HasColumnType("nvarchar(500)");
 
                                             b3.HasKey("LessonId", "QuestionId", "Id");
 

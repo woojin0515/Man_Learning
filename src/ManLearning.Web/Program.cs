@@ -20,14 +20,14 @@ builder.Services.AddScoped<CurrentLearnerContext>();
 
 var app = builder.Build();
 
-// Apply pending migrations and seed the demo course catalog on startup. This is an explicit,
-// synchronous step rather than a background job because the current scale does not warrant a
-// separate release/migration pipeline yet (see ADR 0004's "follow-up work").
+// Prepare the schema (migrate on SQL Server, ensure-created on the local SQLite fallback) and
+// seed the demo course catalog on startup. This is an explicit, synchronous step rather than a
+// background job because the current scale does not warrant a separate release/migration
+// pipeline yet (see ADR 0004's "follow-up work").
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<ManLearningDbContext>();
-    await dbContext.Database.MigrateAsync();
-    await ManLearningDbInitializer.SeedDemoCourseCatalogAsync(dbContext);
+    await ManLearningDbInitializer.InitializeAsync(dbContext);
 }
 
 // Configure the HTTP request pipeline.

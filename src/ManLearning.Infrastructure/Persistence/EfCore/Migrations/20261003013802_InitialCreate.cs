@@ -15,8 +15,8 @@ namespace ManLearning.Infrastructure.Persistence.EfCore.Migrations
                 name: "Courses",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Title = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -27,9 +27,9 @@ namespace ManLearning.Infrastructure.Persistence.EfCore.Migrations
                 name: "LessonProgress",
                 columns: table => new
                 {
-                    LearnerId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    LessonId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    State = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false)
+                    LearnerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    LessonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    State = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -40,10 +40,10 @@ namespace ManLearning.Infrastructure.Persistence.EfCore.Migrations
                 name: "Streaks",
                 columns: table => new
                 {
-                    LearnerId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    CurrentLength = table.Column<int>(type: "INTEGER", nullable: false),
-                    LongestLength = table.Column<int>(type: "INTEGER", nullable: false),
-                    LastActiveDate = table.Column<DateOnly>(type: "TEXT", nullable: true)
+                    LearnerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CurrentLength = table.Column<int>(type: "int", nullable: false),
+                    LongestLength = table.Column<int>(type: "int", nullable: false),
+                    LastActiveDate = table.Column<DateOnly>(type: "date", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -54,11 +54,11 @@ namespace ManLearning.Infrastructure.Persistence.EfCore.Migrations
                 name: "XpAwards",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    LearnerId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Amount = table.Column<int>(type: "INTEGER", nullable: false),
-                    Reason = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
-                    AwardedAtUtc = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    LearnerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Amount = table.Column<int>(type: "int", nullable: false),
+                    Reason = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    AwardedAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -69,10 +69,10 @@ namespace ManLearning.Infrastructure.Persistence.EfCore.Migrations
                 name: "Lessons",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Title = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
-                    Position = table.Column<int>(type: "INTEGER", nullable: false),
-                    CourseId = table.Column<Guid>(type: "TEXT", nullable: false)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Position = table.Column<int>(type: "int", nullable: false),
+                    CourseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -89,8 +89,8 @@ namespace ManLearning.Infrastructure.Persistence.EfCore.Migrations
                 name: "Quizzes",
                 columns: table => new
                 {
-                    LessonId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false)
+                    LessonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -107,9 +107,9 @@ namespace ManLearning.Infrastructure.Persistence.EfCore.Migrations
                 name: "Questions",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    LessonId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Text = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: false)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    LessonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Text = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -126,11 +126,11 @@ namespace ManLearning.Infrastructure.Persistence.EfCore.Migrations
                 name: "AnswerChoices",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    LessonId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    QuestionId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Text = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
-                    IsCorrect = table.Column<bool>(type: "INTEGER", nullable: false)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    LessonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    QuestionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Text = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    IsCorrect = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
