@@ -18,6 +18,7 @@ public static class InfrastructureServiceCollectionExtensions
         services.AddSingleton<ICourseRepository, InMemoryCourseRepository>();
         services.AddSingleton<ILessonProgressRepository, InMemoryLessonProgressRepository>();
         services.AddSingleton<IXpAwardRepository, InMemoryXpAwardRepository>();
+        services.AddSingleton<IStreakRepository, InMemoryStreakRepository>();
 
         return services;
     }

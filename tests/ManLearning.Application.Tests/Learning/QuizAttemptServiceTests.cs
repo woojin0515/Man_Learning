@@ -14,6 +14,7 @@ public class QuizAttemptServiceTests
         QuizAttemptService Service,
         InMemoryLessonProgressRepository ProgressRepository,
         InMemoryXpAwardRepository XpAwardRepository,
+        InMemoryStreakRepository StreakRepository,
         Lesson Lesson,
         AnswerChoice CorrectChoice,
         AnswerChoice WrongChoice,
@@ -34,12 +35,14 @@ public class QuizAttemptServiceTests
 
         var progressRepository = new InMemoryLessonProgressRepository();
         var xpAwardRepository = new InMemoryXpAwardRepository();
+        var streakRepository = new InMemoryStreakRepository();
         var dateTimeProvider = new FixedDateTimeProvider(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
         var service = new QuizAttemptService(
-            courseRepository, progressRepository, xpAwardRepository, dateTimeProvider);
+            courseRepository, progressRepository, xpAwardRepository, streakRepository, dateTimeProvider);
 
-        return new Fixture(service, progressRepository, xpAwardRepository, lesson, correctChoice, wrongChoice, question);
+        return new Fixture(
+            service, progressRepository, xpAwardRepository, streakRepository, lesson, correctChoice, wrongChoice, question);
     }
 
     [Fact]
@@ -60,6 +63,9 @@ public class QuizAttemptServiceTests
 
         var progress = await fixture.ProgressRepository.FindAsync(learnerId, fixture.Lesson.Id);
         Assert.Equal(LessonCompletionState.Completed, progress!.State);
+
+        var streak = await fixture.StreakRepository.FindAsync(learnerId);
+        Assert.Equal(1, streak!.CurrentLength);
     }
 
     [Fact]
