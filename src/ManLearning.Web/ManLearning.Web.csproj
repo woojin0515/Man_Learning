@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ManLearning.Application\ManLearning.Application.csproj" />
+    <ProjectReference Include="..\ManLearning.Infrastructure\ManLearning.Infrastructure.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

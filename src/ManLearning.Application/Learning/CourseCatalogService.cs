@@ -12,6 +12,15 @@ namespace ManLearning.Application.Learning;
 /// </summary>
 public sealed class CourseCatalogService(ICourseRepository courseRepository)
 {
+    public async Task<IReadOnlyList<CourseSummaryDto>> GetCourseListAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var courses = await courseRepository.GetAllAsync(cancellationToken);
+
+        return [.. courses.Select(course => new CourseSummaryDto(
+            course.Id, course.Title, course.Lessons.Count))];
+    }
+
     public async Task<CourseDto> GetCourseAsync(
         CourseId courseId, CancellationToken cancellationToken = default)
     {

@@ -1,0 +1,113 @@
+@using ManLearning.Application.Learning
+@using ManLearning.Application.Learning.Dtos
+@using ManLearning.Domain.Courses
+@using ManLearning.Domain.Learners
+@using ManLearning.Domain.Quizzes
+@inject QuizAttemptService QuizAttemptService
+
+<div class="quiz-panel">
+    @if (_result is not null)
+    {
+        <div class="quiz-result @(_result.LessonCompleted ? "quiz-result-success" : "quiz-result-retry")" role="status">
+            <p class="state-title">
+                @_result.CorrectAnswerCount / @_result.TotalQuestionCount 문제 정답
+            </p>
+            @if (_result.LessonCompleted)
+            {
+                <p class="state-body">레슨을 완료했습니다! +@_result.XpAwarded XP를 획득했습니다.</p>
+            }
+            else
+            {
+                <p class="state-body">모든 문제를 맞히면 레슨이 완료됩니다. 다시 도전해 보세요.</p>
+            }
+            <button type="button" class="btn-secondary" @onclick="Reset">다시 풀기</button>
+        </div>
+    }
+    else
+    {
+        <form @onsubmit="SubmitAsync">
+            @foreach (var question in Quiz.Questions)
+            {
+                <fieldset class="question-card">
+                    <legend class="question-text">@question.Text</legend>
+                    @foreach (var choice in question.AnswerChoices)
+                    {
+                        var inputId = $"q-{question.Id.Value}-c-{choice.Id.Value}";
+                        <label class="choice-row" for="@inputId">
+                            <input
+                                type="radio"
+                                id="@inputId"
+                                name="@($"q-{question.Id.Value}")"
+                                checked="@(_selectedAnswers.GetValueOrDefault(question.Id) == choice.Id)"
+                                @onchange="() => SelectAnswer(question.Id, choice.Id)" />
+                            <span>@choice.Text</span>
+                        </label>
+                    }
+                </fieldset>
+            }
+
+            @if (_submitError)
+            {
+                <p class="form-error" role="alert">제출 중 문제가 발생했습니다. 다시 시도해 주세요.</p>
+            }
+
+            <button type="submit" class="btn-primary" disabled="@(!AllAnswered || _submitting)">
+                @(_submitting ? "채점 중…" : "제출하기")
+            </button>
+        </form>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public required QuizDto Quiz { get; set; }
+    [Parameter, EditorRequired] public required LearnerId LearnerId { get; set; }
+    [Parameter, EditorRequired] public required LessonId LessonId { get; set; }
+
+    private readonly Dictionary<QuestionId, AnswerChoiceId> _selectedAnswers = [];
+    private QuizAttemptResultDto? _result;
+    private bool _submitting;
+    private bool _submitError;
+
+    private bool AllAnswered => Quiz.Questions.All(question => _selectedAnswers.ContainsKey(question.Id));
+
+    private void SelectAnswer(QuestionId questionId, AnswerChoiceId choiceId)
+    {
+        _selectedAnswers[questionId] = choiceId;
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (!AllAnswered || _submitting)
+        {
+            return;
+        }
+
+        _submitting = true;
+        _submitError = false;
+
+        try
+        {
+            var command = new SubmitQuizAttemptCommand(
+                LearnerId,
+                LessonId,
+                [.. _selectedAnswers.Select(pair => new QuestionAnswerDto(pair.Key, pair.Value))]);
+
+            _result = await QuizAttemptService.SubmitQuizAttemptAsync(command);
+        }
+        catch (Exception)
+        {
+            _submitError = true;
+        }
+        finally
+        {
+            _submitting = false;
+        }
+    }
+
+    private void Reset()
+    {
+        _result = null;
+        _selectedAnswers.Clear();
+        _submitError = false;
+    }
+}

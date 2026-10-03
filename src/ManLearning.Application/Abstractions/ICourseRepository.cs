@@ -9,6 +9,12 @@ namespace ManLearning.Application.Abstractions;
 /// </summary>
 public interface ICourseRepository
 {
+    /// <summary>
+    /// Returns every course in the catalog. Intended for list/browse views; callers that need a
+    /// single course's full lesson and quiz detail should use <see cref="GetByIdAsync"/>.
+    /// </summary>
+    Task<IReadOnlyList<Course>> GetAllAsync(CancellationToken cancellationToken = default);
+
     Task<Course?> GetByIdAsync(CourseId courseId, CancellationToken cancellationToken = default);
 
     /// <summary>

@@ -1,0 +1,191 @@
+/*
+ * Shared, reusable component classes built on the design tokens in tokens.css.
+ * Keep this file to generic, cross-page primitives (cards, buttons, state messaging).
+ * Page-specific layout belongs in that page's .razor.css instead.
+ */
+
+.page-title {
+    font-size: var(--fs-2xl);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: var(--space-8) 0 var(--space-6);
+}
+
+/* Buttons --------------------------------------------------------------- */
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+    font-size: var(--fs-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--ease-out);
+}
+
+@media (hover: hover) {
+    .btn-secondary:hover {
+        background: var(--surface-sunken);
+    }
+}
+
+.btn-secondary:active {
+    transform: scale(0.98);
+}
+
+.btn-secondary:disabled {
+    color: var(--text-subtle);
+    border-color: var(--border);
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* State messaging (empty / error / loading) ------------------------------ */
+
+.state-card {
+    border-radius: var(--r-lg);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: var(--space-8) var(--space-6);
+    text-align: center;
+    max-width: 480px;
+    margin: var(--space-8) auto;
+}
+
+.state-card.state-error {
+    border-color: var(--danger);
+    background: var(--surface);
+}
+
+.state-title {
+    font-size: var(--fs-lg);
+    font-weight: 700;
+    margin: 0 0 var(--space-2);
+}
+
+.state-body {
+    font-size: var(--fs-sm);
+    color: var(--text-muted);
+    margin: 0 0 var(--space-4);
+}
+
+/* Skeleton loading -------------------------------------------------------- */
+
+.skeleton {
+    position: relative;
+    overflow: hidden;
+    background: var(--surface-sunken);
+    color: transparent;
+    pointer-events: none;
+}
+
+.skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+    animation: skeleton-sweep 1.4s var(--ease-out) infinite;
+}
+
+@keyframes skeleton-sweep {
+    to {
+        transform: translateX(100%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .skeleton::after {
+        animation: none;
+    }
+}
+
+/* Navigation / status primitives ----------------------------------------- */
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--text-muted);
+    text-decoration: none;
+    margin-top: var(--space-4);
+}
+
+@media (hover: hover) {
+    .back-link:hover {
+        color: var(--text);
+    }
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 0 var(--space-3);
+    border-radius: var(--r-full);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.status-badge.status-neutral {
+    background: var(--surface-sunken);
+    color: var(--text-muted);
+}
+
+.status-badge.status-warning {
+    background: var(--warning-soft);
+    color: var(--warning);
+}
+
+.status-badge.status-success {
+    background: var(--success-soft);
+    color: var(--success);
+}
+
+/* Buttons: primary ------------------------------------------------------- */
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--r-md);
+    background: var(--accent);
+    color: var(--on-accent);
+    border: none;
+    font-size: var(--fs-md);
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: background var(--duration-fast) var(--ease-out),
+        transform var(--duration-fast) var(--ease-out);
+}
+
+@media (hover: hover) {
+    .btn-primary:hover:not(:disabled) {
+        background: var(--accent-strong);
+    }
+}
+
+.btn-primary:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+    background: var(--border-strong);
+    color: var(--text-subtle);
+    cursor: not-allowed;
+    box-shadow: none;
+}
