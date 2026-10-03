@@ -55,3 +55,7 @@ packages/
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Local SQLite dev fallback DB (never commit real/dev data)
+*.dev.db
+*.dev.db-*

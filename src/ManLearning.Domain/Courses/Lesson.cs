@@ -30,4 +30,14 @@ public sealed class Lesson
         Position = position;
         Quiz = quiz;
     }
+
+    /// <summary>
+    /// Reserved for EF Core materialization. The Quiz navigation (owned type) cannot be bound as
+    /// a constructor parameter, so EF Core restores instances via this parameterless constructor
+    /// and backing fields instead.
+    /// </summary>
+    private Lesson()
+    {
+        Title = string.Empty;
+    }
 }
