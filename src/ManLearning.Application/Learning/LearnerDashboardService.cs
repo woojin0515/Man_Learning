@@ -7,14 +7,15 @@ using ManLearning.Domain.Xp;
 namespace ManLearning.Application.Learning;
 
 /// <summary>
-/// Read-only use case that aggregates a learner's XP, level, and lesson completion into a
-/// dashboard snapshot. Deliberately excludes streak and achievement data; those rules remain
-/// deferred open decisions (see docs/architecture/domain-model.md) and must not be invented here.
+/// Read-only use case that aggregates a learner's XP, level, streak, and lesson completion into a
+/// dashboard snapshot. Deliberately excludes achievement data; the achievement catalog remains a
+/// deferred open decision (see docs/architecture/domain-model.md) and must not be invented here.
 /// </summary>
 public sealed class LearnerDashboardService(
     ICourseRepository courseRepository,
     ILessonProgressRepository lessonProgressRepository,
-    IXpAwardRepository xpAwardRepository)
+    IXpAwardRepository xpAwardRepository,
+    IStreakRepository streakRepository)
 {
     public async Task<LearnerDashboardDto> GetDashboardAsync(
         LearnerId learnerId, CancellationToken cancellationToken = default)
@@ -23,6 +24,8 @@ public sealed class LearnerDashboardService(
         var awards = await xpAwardRepository.GetByLearnerAsync(learnerId, cancellationToken);
         var progressRecords = await lessonProgressRepository.GetAllForLearnerAsync(
             learnerId, cancellationToken);
+        var streak = await streakRepository.FindAsync(learnerId, cancellationToken)
+            ?? new Streak(learnerId);
 
         var completedLessonIds = progressRecords
             .Where(progress => progress.State == LessonCompletionState.Completed)
@@ -47,6 +50,7 @@ public sealed class LearnerDashboardService(
                 levelProgress.CurrentLevelXp,
                 levelProgress.NextLevelXp,
                 levelProgress.ProgressToNextLevel),
+            new StreakDto(streak.CurrentLength, streak.LongestLength, streak.LastActiveDate),
             courseProgress.Sum(course => course.CompletedLessonCount),
             courseProgress.Sum(course => course.TotalLessonCount),
             courseProgress);

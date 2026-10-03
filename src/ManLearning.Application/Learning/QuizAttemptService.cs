@@ -1,6 +1,7 @@
 using ManLearning.Application.Abstractions;
 using ManLearning.Application.Common;
 using ManLearning.Application.Learning.Dtos;
+using ManLearning.Domain.Learners;
 using ManLearning.Domain.Progress;
 using ManLearning.Domain.Quizzes;
 using ManLearning.Domain.Xp;
@@ -16,6 +17,7 @@ public sealed class QuizAttemptService(
     ICourseRepository courseRepository,
     ILessonProgressRepository lessonProgressRepository,
     IXpAwardRepository xpAwardRepository,
+    IStreakRepository streakRepository,
     IDateTimeProvider dateTimeProvider)
 {
     public async Task<QuizAttemptResultDto> SubmitQuizAttemptAsync(
@@ -55,6 +57,11 @@ public sealed class QuizAttemptService(
 
             await xpAwardRepository.AddAsync(award, cancellationToken);
             xpAwarded = LessonCompletionPolicy.LessonCompletionXpAmount;
+
+            var streak = await streakRepository.FindAsync(command.LearnerId, cancellationToken)
+                ?? new Streak(command.LearnerId);
+            streak.RecordActivity(DateOnly.FromDateTime(dateTimeProvider.UtcNow.UtcDateTime));
+            await streakRepository.SaveAsync(streak, cancellationToken);
         }
 
         await lessonProgressRepository.SaveAsync(progress, cancellationToken);

@@ -23,6 +23,7 @@ else if (_dashboard is null)
         <div class="summary-card skeleton"></div>
         <div class="summary-card skeleton"></div>
         <div class="summary-card skeleton"></div>
+        <div class="summary-card skeleton"></div>
     </div>
 }
 else
@@ -45,6 +46,14 @@ else
         <div class="summary-card">
             <p class="summary-value">@_dashboard.CompletedLessonCount<span class="summary-unit">/ @_dashboard.TotalLessonCount</span></p>
             <p class="summary-label">완료한 레슨</p>
+        </div>
+        <div class="summary-card">
+            <p class="summary-value">@_dashboard.Streak.CurrentLength<span class="summary-unit">일</span></p>
+            <p class="summary-label">연속 학습</p>
+            @if (_dashboard.Streak.LongestLength > _dashboard.Streak.CurrentLength)
+            {
+                <p class="summary-sublabel">최고 기록 @(_dashboard.Streak.LongestLength)일</p>
+            }
         </div>
     </div>
 

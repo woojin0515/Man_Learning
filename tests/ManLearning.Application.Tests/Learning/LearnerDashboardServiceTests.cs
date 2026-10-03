@@ -18,7 +18,10 @@ public class LearnerDashboardServiceTests
         courseRepository.Add(course);
 
         var service = new LearnerDashboardService(
-            courseRepository, new InMemoryLessonProgressRepository(), new InMemoryXpAwardRepository());
+            courseRepository,
+            new InMemoryLessonProgressRepository(),
+            new InMemoryXpAwardRepository(),
+            new InMemoryStreakRepository());
 
         var dashboard = await service.GetDashboardAsync(LearnerId.New());
 
@@ -26,6 +29,9 @@ public class LearnerDashboardServiceTests
         Assert.Equal(1, dashboard.LevelProgress.Level);
         Assert.Equal(0, dashboard.LevelProgress.CurrentLevelXp);
         Assert.Equal(100, dashboard.LevelProgress.NextLevelXp);
+        Assert.Equal(0, dashboard.Streak.CurrentLength);
+        Assert.Equal(0, dashboard.Streak.LongestLength);
+        Assert.Null(dashboard.Streak.LastActiveDate);
         Assert.Equal(0, dashboard.CompletedLessonCount);
         Assert.Equal(1, dashboard.TotalLessonCount);
         Assert.Equal(0, dashboard.CourseProgress.Single().CompletedLessonCount);
@@ -71,7 +77,13 @@ public class LearnerDashboardServiceTests
         await xpAwardRepository.AddAsync(
             new XpAward(otherLearnerId, 999, "Someone else's award", DateTimeOffset.UtcNow));
 
-        var service = new LearnerDashboardService(courseRepository, progressRepository, xpAwardRepository);
+        var streakRepository = new InMemoryStreakRepository();
+        var streak = new Streak(learnerId);
+        streak.RecordActivity(new DateOnly(2026, 1, 1));
+        await streakRepository.SaveAsync(streak);
+
+        var service = new LearnerDashboardService(
+            courseRepository, progressRepository, xpAwardRepository, streakRepository);
 
         var dashboard = await service.GetDashboardAsync(learnerId);
 
@@ -79,6 +91,8 @@ public class LearnerDashboardServiceTests
         Assert.Equal(2, dashboard.LevelProgress.Level);
         Assert.Equal(100, dashboard.LevelProgress.CurrentLevelXp);
         Assert.Equal(200, dashboard.LevelProgress.NextLevelXp);
+        Assert.Equal(1, dashboard.Streak.CurrentLength);
+        Assert.Equal(new DateOnly(2026, 1, 1), dashboard.Streak.LastActiveDate);
         Assert.Equal(1, dashboard.CompletedLessonCount);
         Assert.Equal(3, dashboard.TotalLessonCount);
         Assert.Equal(2, dashboard.CourseProgress.Count);
