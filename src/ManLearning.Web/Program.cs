@@ -1,10 +1,19 @@
+using ManLearning.Application.Learning;
+using ManLearning.Infrastructure;
 using ManLearning.Web.Components;
+using ManLearning.Web.Learners;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddManLearningInfrastructure();
+builder.Services.AddScoped<CourseCatalogService>();
+builder.Services.AddScoped<LessonProgressService>();
+builder.Services.AddScoped<QuizAttemptService>();
+builder.Services.AddScoped<CurrentLearnerContext>();
 
 var app = builder.Build();
 

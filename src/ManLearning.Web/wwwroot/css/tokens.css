@@ -1,0 +1,130 @@
+/*
+ * Design tokens — see .github/design.md for the full rulebook.
+ * All colors, radii, spacing, and durations used across the app must be declared here and
+ * referenced by variable; no hardcoded values in component styles.
+ */
+:root {
+  /* 배경 계층 */
+  --bg: #FAFAFA;
+  --surface: #FFFFFF;
+  --surface-raised: #FFFFFF;
+  --surface-sunken: #F1F2F4;
+
+  /* 배경 위 전경색 */
+  --text: #14161A;            /* surface 대비 15.8:1 */
+  --text-muted: #5A6069;      /* surface 대비 6.4:1 */
+  --text-subtle: #6E747D;     /* surface 대비 4.6:1 — 하한 */
+
+  --border: #E3E5E9;
+  --border-strong: #C6CAD1;   /* 3.1:1 */
+
+  /* 강조색 */
+  --accent: #2563EB;
+  --accent-strong: #1D4ED8;
+  --on-accent: #FFFFFF;       /* accent 대비 5.2:1 */
+  --accent-soft: #E8EEFE;     /* 강조색의 옅은 배경(칩, 하이라이트) */
+
+  /* 상태색 */
+  --danger: #C4262E;   --on-danger: #FFFFFF;
+  --warning: #8A5A00;  --on-warning: #FFFFFF;
+  --success: #0F7B3E;  --on-success: #FFFFFF;
+  --info: #1F63C4;     --on-info: #FFFFFF;
+  --success-soft: #E7F6EE;
+  --warning-soft: #FBF2E2;
+
+  /* 반경 */
+  --r-xs: 4px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 24px;
+  --r-full: 999px;
+
+  /* 여백 (4px 배수) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* 그림자 (2겹: 앰비언트 + 다이렉트) */
+  --shadow-sm: 0 1px 2px rgba(16,18,22,.05), 0 2px 8px -4px rgba(16,18,22,.08);
+  --shadow-md: 0 1px 2px rgba(16,18,22,.06), 0 8px 24px -8px rgba(16,18,22,.12);
+
+  /* 타이포그래피 */
+  --font-sans: Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+    "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+  --fs-xs: 12px;
+  --fs-sm: 14px;
+  --fs-md: 16px;
+  --fs-lg: 18px;
+  --fs-xl: 20px;
+  --fs-2xl: 24px;
+  --fs-3xl: 30px;
+
+  /* 모션 */
+  --duration-fast: 150ms;
+  --duration-base: 220ms;
+  --ease-out: cubic-bezier(.2, .8, .2, 1);
+  --ease-in: cubic-bezier(.4, 0, 1, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0E1013;
+    --surface: #16181C;
+    --surface-raised: #1C1F24;
+    --surface-sunken: #0B0D10;
+
+    --text: #E8EAED;
+    --text-muted: #AEB4BD;
+    --text-subtle: #8A919C;
+
+    --border: #2A2D33;
+    --border-strong: #3C4049;
+
+    --accent: #5B8DEF;
+    --accent-strong: #80A8F5;
+    --on-accent: #0E1013;
+    --accent-soft: #1C2740;
+
+    --danger: #FF6B6B;   --on-danger: #2A0A0A;
+    --warning: #F0B429;  --on-warning: #2A1D00;
+    --success: #3DD68C;  --on-success: #042713;
+    --info: #6AA9FF;     --on-info: #041B36;
+    --success-soft: #0F2A1D;
+    --warning-soft: #2A2008;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-md);
+  line-height: 1.65;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  letter-spacing: -0.006em;
+  scrollbar-gutter: stable;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

@@ -14,6 +14,13 @@ public sealed class LessonProgressService(
     ICourseRepository courseRepository,
     ILessonProgressRepository lessonProgressRepository)
 {
+    public async Task<LessonCompletionState> GetLessonStateAsync(
+        LearnerId learnerId, LessonId lessonId, CancellationToken cancellationToken = default)
+    {
+        var progress = await lessonProgressRepository.FindAsync(learnerId, lessonId, cancellationToken);
+        return progress?.State ?? LessonCompletionState.NotStarted;
+    }
+
     public async Task StartLessonAsync(
         LearnerId learnerId, LessonId lessonId, CancellationToken cancellationToken = default)
     {

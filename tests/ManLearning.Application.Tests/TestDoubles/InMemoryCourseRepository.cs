@@ -13,6 +13,9 @@ internal sealed class InMemoryCourseRepository : ICourseRepository
 
     public void Add(Course course) => _courses.Add(course);
 
+    public Task<IReadOnlyList<Course>> GetAllAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<Course>>([.. _courses]);
+
     public Task<Course?> GetByIdAsync(CourseId courseId, CancellationToken cancellationToken = default) =>
         Task.FromResult(_courses.FirstOrDefault(course => course.Id == courseId));
 

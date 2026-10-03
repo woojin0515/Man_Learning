@@ -1,0 +1,97 @@
+@page "/courses/{CourseId:guid}"
+@rendermode InteractiveServer
+@using ManLearning.Application.Learning
+@using ManLearning.Application.Learning.Dtos
+@using ManLearning.Domain.Courses
+@using ManLearning.Domain.Progress
+@using ManLearning.Web.Learners
+@inject CourseCatalogService CourseCatalogService
+@inject LessonProgressService LessonProgressService
+@inject CurrentLearnerContext CurrentLearner
+
+<PageTitle>@(_course?.Title ?? "코스") - Man Learning</PageTitle>
+
+<a class="back-link" href="/courses">← 코스 목록</a>
+
+@if (_loadError)
+{
+    <div class="state-card state-error" role="alert">
+        <p class="state-title">코스를 불러오지 못했습니다</p>
+        <p class="state-body">코스가 존재하지 않거나 일시적인 오류일 수 있습니다.</p>
+        <button type="button" class="btn-secondary" @onclick="LoadAsync">다시 시도</button>
+    </div>
+}
+else if (_course is null)
+{
+    <div class="lesson-list" aria-hidden="true">
+        <div class="lesson-row skeleton"></div>
+        <div class="lesson-row skeleton"></div>
+    </div>
+}
+else
+{
+    <h1 class="page-title">@_course.Title</h1>
+
+    <ol class="lesson-list">
+        @foreach (var lesson in _course.Lessons)
+        {
+            var state = _stateByLessonId.GetValueOrDefault(lesson.Id, LessonCompletionState.NotStarted);
+            <li>
+                <a class="lesson-row" href="@($"/courses/{CourseId}/lessons/{lesson.Id.Value}")">
+                    <span class="lesson-row-position">@(lesson.Position + 1)</span>
+                    <span class="lesson-row-body">
+                        <span class="lesson-row-title">@lesson.Title</span>
+                        <span class="lesson-row-meta">@(lesson.Quiz is null ? "퀴즈 없음" : $"퀴즈 {lesson.Quiz.Questions.Count}문항")</span>
+                    </span>
+                    <span class="status-badge status-@StatusClass(state)">@StatusLabel(state)</span>
+                </a>
+            </li>
+        }
+    </ol>
+}
+
+@code {
+    [Parameter] public Guid CourseId { get; set; }
+
+    private CourseDto? _course;
+    private bool _loadError;
+    private readonly Dictionary<Domain.Courses.LessonId, LessonCompletionState> _stateByLessonId = [];
+
+    protected override Task OnInitializedAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        _loadError = false;
+        _course = null;
+        StateHasChanged();
+
+        try
+        {
+            _course = await CourseCatalogService.GetCourseAsync(new Domain.Courses.CourseId(CourseId));
+
+            foreach (var lesson in _course.Lessons)
+            {
+                _stateByLessonId[lesson.Id] = await LessonProgressService.GetLessonStateAsync(
+                    CurrentLearner.LearnerId, lesson.Id);
+            }
+        }
+        catch (Exception)
+        {
+            _loadError = true;
+        }
+    }
+
+    private static string StatusClass(LessonCompletionState state) => state switch
+    {
+        LessonCompletionState.Completed => "success",
+        LessonCompletionState.InProgress => "warning",
+        _ => "neutral",
+    };
+
+    private static string StatusLabel(LessonCompletionState state) => state switch
+    {
+        LessonCompletionState.Completed => "완료",
+        LessonCompletionState.InProgress => "진행 중",
+        _ => "시작 전",
+    };
+}

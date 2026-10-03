@@ -1,0 +1,67 @@
+@page "/courses"
+@rendermode InteractiveServer
+@using ManLearning.Application.Learning
+@using ManLearning.Application.Learning.Dtos
+@inject CourseCatalogService CourseCatalogService
+
+<PageTitle>코스 목록 - Man Learning</PageTitle>
+
+<h1 class="page-title">코스 목록</h1>
+
+@if (_loadError)
+{
+    <div class="state-card state-error" role="alert">
+        <p class="state-title">코스를 불러오지 못했습니다</p>
+        <p class="state-body">잠시 후 다시 시도해 주세요.</p>
+        <button type="button" class="btn-secondary" @onclick="LoadCoursesAsync">다시 시도</button>
+    </div>
+}
+else if (_courses is null)
+{
+    <div class="course-grid" aria-hidden="true">
+        <div class="course-card skeleton"></div>
+        <div class="course-card skeleton"></div>
+    </div>
+}
+else if (_courses.Count == 0)
+{
+    <div class="state-card">
+        <p class="state-title">아직 등록된 코스가 없습니다</p>
+        <p class="state-body">새 코스가 열리면 이곳에 표시됩니다.</p>
+    </div>
+}
+else
+{
+    <div class="course-grid">
+        @foreach (var course in _courses)
+        {
+            <a class="course-card" href="@($"/courses/{course.Id.Value}")">
+                <h2 class="course-card-title">@course.Title</h2>
+                <p class="course-card-meta">레슨 @(course.LessonCount)개</p>
+            </a>
+        }
+    </div>
+}
+
+@code {
+    private IReadOnlyList<CourseSummaryDto>? _courses;
+    private bool _loadError;
+
+    protected override Task OnInitializedAsync() => LoadCoursesAsync();
+
+    private async Task LoadCoursesAsync()
+    {
+        _loadError = false;
+        _courses = null;
+        StateHasChanged();
+
+        try
+        {
+            _courses = await CourseCatalogService.GetCourseListAsync();
+        }
+        catch (Exception)
+        {
+            _loadError = true;
+        }
+    }
+}

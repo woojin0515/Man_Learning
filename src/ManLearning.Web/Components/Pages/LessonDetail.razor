@@ -1,0 +1,110 @@
+@page "/courses/{CourseId:guid}/lessons/{LessonId:guid}"
+@rendermode InteractiveServer
+@using ManLearning.Application.Learning
+@using ManLearning.Application.Learning.Dtos
+@using ManLearning.Domain.Courses
+@using ManLearning.Domain.Progress
+@using ManLearning.Domain.Quizzes
+@using ManLearning.Web.Learners
+@inject CourseCatalogService CourseCatalogService
+@inject LessonProgressService LessonProgressService
+@inject CurrentLearnerContext CurrentLearner
+
+<PageTitle>@(_lesson?.Title ?? "레슨") - Man Learning</PageTitle>
+
+<a class="back-link" href="@($"/courses/{CourseId}")">← 코스로 돌아가기</a>
+
+@if (_loadError)
+{
+    <div class="state-card state-error" role="alert">
+        <p class="state-title">레슨을 불러오지 못했습니다</p>
+        <p class="state-body">잠시 후 다시 시도해 주세요.</p>
+        <button type="button" class="btn-secondary" @onclick="LoadAsync">다시 시도</button>
+    </div>
+}
+else if (_lesson is null)
+{
+    <div class="state-card skeleton" aria-hidden="true" style="height: 220px;"></div>
+}
+else
+{
+    <h1 class="page-title">@_lesson.Title</h1>
+
+    @if (_lesson.Quiz is null)
+    {
+        <div class="lesson-panel">
+            <p class="state-body">이 레슨은 퀴즈 없이 완료할 수 있습니다.</p>
+            <button
+                type="button"
+                class="btn-primary"
+                disabled="@_startInFlight"
+                @onclick="StartLessonAsync">
+                @(_startInFlight ? "처리 중…" : _started ? "완료됨" : "레슨 시작하기")
+            </button>
+        </div>
+    }
+    else
+    {
+        <QuizForm Quiz="_lesson.Quiz" LearnerId="CurrentLearner.LearnerId" LessonId="_lesson.Id" />
+    }
+}
+
+@code {
+    [Parameter] public Guid CourseId { get; set; }
+    [Parameter] public Guid LessonId { get; set; }
+
+    private LessonDto? _lesson;
+    private bool _loadError;
+    private bool _started;
+    private bool _startInFlight;
+
+    protected override Task OnInitializedAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        _loadError = false;
+        _lesson = null;
+        StateHasChanged();
+
+        try
+        {
+            var course = await CourseCatalogService.GetCourseAsync(new CourseId(CourseId));
+            _lesson = course.Lessons.FirstOrDefault(lesson => lesson.Id == new Domain.Courses.LessonId(LessonId));
+
+            if (_lesson is null)
+            {
+                _loadError = true;
+                return;
+            }
+
+            if (_lesson.Quiz is null)
+            {
+                var state = await LessonProgressService.GetLessonStateAsync(CurrentLearner.LearnerId, _lesson.Id);
+                _started = state != LessonCompletionState.NotStarted;
+            }
+        }
+        catch (Exception)
+        {
+            _loadError = true;
+        }
+    }
+
+    private async Task StartLessonAsync()
+    {
+        if (_lesson is null || _startInFlight)
+        {
+            return;
+        }
+
+        _startInFlight = true;
+        try
+        {
+            await LessonProgressService.StartLessonAsync(CurrentLearner.LearnerId, _lesson.Id);
+            _started = true;
+        }
+        finally
+        {
+            _startInFlight = false;
+        }
+    }
+}
