@@ -35,6 +35,18 @@ public sealed class Question
     }
 
     /// <summary>
+    /// Reserved for ORM materialization (see Infrastructure's EF Core configuration). This does
+    /// not introduce any ORM or database dependency here: it is plain reflection-friendly
+    /// construction, and the collection is populated via the backing field afterward, not
+    /// through this constructor.
+    /// </summary>
+    private Question()
+    {
+        Text = string.Empty;
+        _answerChoices = [];
+    }
+
+    /// <summary>
     /// Determines whether the given answer choice is the correct response to this question.
     /// </summary>
     public bool IsCorrectChoice(AnswerChoiceId answerChoiceId)

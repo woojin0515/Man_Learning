@@ -24,6 +24,17 @@ public sealed class Quiz
     }
 
     /// <summary>
+    /// Reserved for ORM materialization (see Infrastructure's EF Core configuration). This does
+    /// not introduce any ORM or database dependency here: it is plain reflection-friendly
+    /// construction, and the collection is populated via the backing field afterward, not
+    /// through this constructor.
+    /// </summary>
+    private Quiz()
+    {
+        _questions = [];
+    }
+
+    /// <summary>
     /// Scores a set of submitted answers against this quiz's definition. Every question must
     /// have a corresponding submission (invariant 4).
     /// </summary>
