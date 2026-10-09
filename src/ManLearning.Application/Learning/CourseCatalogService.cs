@@ -30,6 +30,19 @@ public sealed class CourseCatalogService(ICourseRepository courseRepository)
         return MapToDto(course);
     }
 
+    /// <summary>
+    /// Looks up a single lesson (and its quiz, if any) without loading the owning course's full
+    /// lesson list — the Lesson Detail vertical slice only needs this one lesson.
+    /// </summary>
+    public async Task<LessonDto> GetLessonAsync(
+        LessonId lessonId, CancellationToken cancellationToken = default)
+    {
+        var lesson = await courseRepository.FindLessonAsync(lessonId, cancellationToken)
+            ?? throw new NotFoundException($"Lesson {lessonId} was not found.");
+
+        return MapToDto(lesson);
+    }
+
     private static CourseDto MapToDto(Course course) => new(
         course.Id,
         course.Title,

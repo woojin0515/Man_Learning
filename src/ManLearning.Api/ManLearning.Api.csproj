@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      ManLearning.Infrastructure is referenced only so this composition root can call
+      AddManLearningInfrastructure (the same registration helper ManLearning.Web already uses).
+      Controllers must still depend on ManLearning.Application only, never on Infrastructure or
+      Domain types directly, per ADR-0006.
+    -->
+    <ProjectReference Include="..\ManLearning.Application\ManLearning.Application.csproj" />
+    <ProjectReference Include="..\ManLearning.Infrastructure\ManLearning.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

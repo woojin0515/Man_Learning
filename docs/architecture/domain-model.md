@@ -59,3 +59,9 @@ The slice should establish the domain language and scoring/completion rules befo
 - The calendar/time-zone policy for streaks.
 - The achievement catalog and evaluation timing.
 - The learner identity and authentication model.
+- **Lesson content modeling.** As of the Lesson Vertical Slice (`GET /api/courses/{courseId}`,
+  `GET /api/lessons/{lessonId}`), the `Lesson` entity has no content/body field — only `Title`,
+  `Position`, and an optional `Quiz`. The Lesson Detail API/UI therefore expose lesson *metadata*
+  only. Whether lesson content is plain text, Markdown, HTML, or structured blocks, and whether it
+  lives directly on `Lesson` or in a separate content entity, is a separate future architectural
+  decision and should not be assumed from the current API shape.
