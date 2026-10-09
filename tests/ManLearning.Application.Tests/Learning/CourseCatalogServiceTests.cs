@@ -31,4 +31,31 @@ public class CourseCatalogServiceTests
 
         await Assert.ThrowsAsync<NotFoundException>(() => service.GetCourseAsync(CourseId.New()));
     }
+
+    [Fact]
+    public async Task GetLessonAsync_WithExistingLesson_ReturnsMappedDto()
+    {
+        var courseRepository = new InMemoryCourseRepository();
+        var course = new Course(CourseId.New(), "AI Fundamentals");
+        var lesson = new Lesson(LessonId.New(), "What is AI?", position: 0);
+        course.AddLesson(lesson);
+        courseRepository.Add(course);
+
+        var service = new CourseCatalogService(courseRepository);
+
+        var dto = await service.GetLessonAsync(lesson.Id);
+
+        Assert.Equal(lesson.Id, dto.Id);
+        Assert.Equal("What is AI?", dto.Title);
+        Assert.Equal(0, dto.Position);
+        Assert.Null(dto.Quiz);
+    }
+
+    [Fact]
+    public async Task GetLessonAsync_WithUnknownLesson_ThrowsNotFoundException()
+    {
+        var service = new CourseCatalogService(new InMemoryCourseRepository());
+
+        await Assert.ThrowsAsync<NotFoundException>(() => service.GetLessonAsync(LessonId.New()));
+    }
 }
