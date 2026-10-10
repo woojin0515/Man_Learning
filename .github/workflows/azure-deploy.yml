@@ -1,0 +1,55 @@
+name: Deploy ManLearning.Web to Azure App Service
+
+# Builds and deploys ManLearning.Web (the Blazor Web App currently hosted on the
+# manlearning-woojin-krc App Service, per ADR 0010) whenever master changes.
+# Uses the App Service publish profile stored as the AZURE_WEBAPP_PUBLISH_PROFILE
+# repository secret - no Azure credentials are ever written to the workflow file.
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch: {}
+
+env:
+  AZURE_WEBAPP_NAME: manlearning-woojin-krc
+  DOTNET_VERSION: "10.0.x"
+  PROJECT_PATH: src/ManLearning.Web/ManLearning.Web.csproj
+  PUBLISH_DIR: ${{ github.workspace }}/publish
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore ManLearning.sln
+
+      - name: Build
+        run: dotnet build ManLearning.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test ManLearning.sln --configuration Release --no-build --verbosity normal
+
+      - name: Publish ManLearning.Web
+        run: >
+          dotnet publish ${{ env.PROJECT_PATH }}
+          --configuration Release
+          --no-build
+          --output ${{ env.PUBLISH_DIR }}
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ${{ env.PUBLISH_DIR }}
